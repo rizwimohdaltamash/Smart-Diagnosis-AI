@@ -185,23 +185,9 @@ const isSymptomRelated = (inputValue) => {
     return false
   }
 
-  // Check how many words match known symptom-related keywords
-  let matchingWords = 0
-  for (const word of words) {
-    const isKnownWord = KNOWN_WORDS.some((knownWord) => {
-      const distance = levenshteinDistance(word, knownWord)
-      const threshold = Math.max(1, Math.floor(word.length * 0.34))
-      return distance <= threshold
-    })
-
-    if (isKnownWord) {
-      matchingWords += 1
-    }
-  }
-
-  // If less than 20% of words match medical keywords, consider it nonsense
-  const matchPercentage = (matchingWords / words.length) * 100
-  return matchPercentage >= 20
+  // Allow any input - AI backend will handle validation
+  // This lets users query any medical condition (diabetes, cancer, etc.)
+  return true
 }
 
 function App() {
@@ -233,13 +219,7 @@ function App() {
 
     const trimmedSymptoms = symptoms.trim()
     if (!trimmedSymptoms) {
-      setError('Please enter symptoms before submitting')
-      return
-    }
-
-    // Check if input is symptom-related
-    if (!isSymptomRelated(trimmedSymptoms)) {
-      setError('⚠️ Please ask questions related to symptoms or health conditions. Example: "fever, cough, headache"')
+      setError('Please enter symptoms or conditions before submitting')
       return
     }
 
@@ -293,8 +273,8 @@ function App() {
 
       <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
         <section className="rounded-2xl border border-sky-200/80 bg-gradient-to-br from-sky-50/95 to-cyan-50/95 p-6 shadow-[0_24px_64px_-30px_rgba(2,132,199,0.35)] backdrop-blur sm:p-8">
-          <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">Describe Symptoms</h1>
-          <p className="mt-2 text-sm text-slate-600 sm:text-base">Enter symptoms to get AI-generated possible conditions.</p>
+          <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">Describe Symptoms or Conditions</h1>
+          <p className="mt-2 text-sm text-slate-600 sm:text-base">Enter any symptoms or health conditions to get AI-generated possible diagnoses.</p>
 
           <form onSubmit={handleSubmit} className="mt-6">
             <label htmlFor="symptoms" className="mb-2 block text-sm font-semibold text-slate-700">
@@ -318,7 +298,7 @@ function App() {
                     setAutocorrectMessage(`Autocorrected: ${corrected}`)
                   }
                 }}
-                placeholder="Example: fever, cough, chest pain"
+                placeholder="Example: fever, diabetes, cough, anxiety, chest pain"
                 className="w-full rounded-xl border border-sky-200 bg-white/90 px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-sky-500"
               />
               <button
